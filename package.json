@@ -1,0 +1,9 @@
+{
+  "root_directory": "/Wallpapers/",
+  "API_key": "89681a6f596b4f5141eff3c0ed398ce2bd6d8488640a505de7d71ad23670dd70",
+  "dependencies": {
+    "requests": "^0.3.0",
+    "pyunsplash": "^1.0.0",
+    "logging": "^3.2.0"
+  }
+}
