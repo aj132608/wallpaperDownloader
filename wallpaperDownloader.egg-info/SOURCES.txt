@@ -1,0 +1,7 @@
+README.md
+setup.py
+wallpaperDownloader.egg-info/PKG-INFO
+wallpaperDownloader.egg-info/SOURCES.txt
+wallpaperDownloader.egg-info/dependency_links.txt
+wallpaperDownloader.egg-info/requires.txt
+wallpaperDownloader.egg-info/top_level.txt
