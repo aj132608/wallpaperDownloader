@@ -3,6 +3,7 @@ import requests
 import os
 import logging
 import json
+from move_to_current_wallpapers import MoveToCurrentWallpapers
 
 
 class WallpaperDownloader:
@@ -20,6 +21,8 @@ class WallpaperDownloader:
         logging.getLogger("pyunsplash").setLevel(logging.DEBUG)
 
         self.__main__()
+
+        MoveToCurrentWallpapers()
 
     def __main__(self):
         current_page = 1
@@ -47,9 +50,13 @@ class WallpaperDownloader:
                 if directory_created:
                     collection_photos = collection.photos(per_page=30)
 
+                    total_photos = 30
+                    current_photo = 1
+
                     for photo in collection_photos.entries:
-                        print(f"Downloading wallpaper from {photo.link_download} \n")
+                        print(f"Downloading wallpaper {current_photo} of {total_photos} \n")
                         self.download_image(collection.title, photo.link_download)
+                        current_photo += 1
 
                     print('\n')
 
