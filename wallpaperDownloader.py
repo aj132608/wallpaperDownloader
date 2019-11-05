@@ -42,7 +42,7 @@ class WallpaperDownloader:
 
             if user_selection.upper() in ["Y"]:
 
-                directory_created = self.make_directory(collection.title)
+                directory_created = self.make_collection_directory(collection.title)
 
                 if directory_created:
                     collection_photos = collection.photos(per_page=30)
@@ -53,7 +53,7 @@ class WallpaperDownloader:
 
                     print('\n')
 
-    def make_directory(self, directory_name):
+    def make_collection_directory(self, directory_name):
         path = f"{self.root_path}{directory_name}"
         try:
             os.mkdir(path)
