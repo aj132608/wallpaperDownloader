@@ -22,23 +22,36 @@ class WallpaperDownloader:
         self.__main__()
 
     def __main__(self):
-        collections_page = self.un_obj.collections(type_='featured', per_page=15)
+        current_page = 1
+
+        self.scan_collection_page(current_page)
+
+        user_selection = input("That was the last from the page. Would you like to continue? (y/n)")
+
+        while user_selection.upper() in ['Y']:
+            # Scan through the next page
+            current_page += 1
+            self.scan_collection_page(current_page)
+            user_selection = input("\nThat was the last from the page. Would you like to continue? (y/n)")
+
+    def scan_collection_page(self, page_num):
+        collections_page = self.un_obj.collections(type_='featured',page=page_num, per_page=15)
 
         for collection in collections_page.entries:
             user_selection = input(f'\nWould you like to download the wallpapers from {collection.title}? (y/n): ')
 
             if user_selection.upper() in ["Y"]:
-                print('\nHere are your download links. \n')
 
-                self.make_directory(collection.title)
+                directory_created = self.make_directory(collection.title)
 
-                collection_photos = collection.photos(per_page=30)
+                if directory_created:
+                    collection_photos = collection.photos(per_page=30)
 
-                for photo in collection_photos.entries:
-                    print(f"Downloading wallpaper from {photo.link_download} \n")
-                    self.download_image(collection.title, photo.link_download)
+                    for photo in collection_photos.entries:
+                        print(f"Downloading wallpaper from {photo.link_download} \n")
+                        self.download_image(collection.title, photo.link_download)
 
-                print('\n')
+                    print('\n')
 
     def make_directory(self, directory_name):
         path = f"{self.root_path}{directory_name}"
@@ -46,8 +59,10 @@ class WallpaperDownloader:
             os.mkdir(path)
         except OSError:
             print(f"\n\nCreation of {directory_name} failed. Check {path}.\n\n")
+            return False
         else:
             print(f"\n\nSuccessfully created {directory_name}.\n\n")
+            return True
 
     def download_image(self, directory_name, download_link):
         import time
