@@ -88,7 +88,7 @@ class WallpaperDownloader:
                 self.checkbox_objects.append(collection_checkbox)
                 collection_checkbox.grid(row=current_row, columnspan=3, sticky=W)
             except Exception as e:
-                new_title = self.validate_string(collection.title)
+                new_title = WallpaperDownloader.validate_string(collection.title)
                 collection_checkbox = Checkbutton(self.contents_frame, text=new_title, variable=current_state,
                                                   bg=self.background_color, fg="black")
                 self.checkbox_objects.append(collection_checkbox)
@@ -127,7 +127,7 @@ class WallpaperDownloader:
 
             for photo in collection_photos.entries:
                 print(f"Downloading wallpaper {current_photo} of {self.photos_per_page} \n")
-                self.download_image(collection.title, photo.link_download)
+                self.download_image(collection.title, photo.link_download, photo.id)
                 current_photo += 1
 
             print('\n')
@@ -150,10 +150,11 @@ class WallpaperDownloader:
             print(f"\n\nSuccessfully created {directory_name}.\n\n")
             return True
 
-    def download_image(self, directory_name, download_link):
+    def download_image(self, directory_name, download_link, photo_id=None):
         import time
         import calendar
-        photo_id = calendar.timegm(time.gmtime())
+        if photo_id is None:
+            photo_id = calendar.timegm(time.gmtime())
 
         path = f"{self.root_path}{directory_name}/wallpaper{photo_id}.jpg"
         r = requests.get(url=download_link, stream=True)
@@ -162,7 +163,8 @@ class WallpaperDownloader:
                 for chunk in r:
                     f.write(chunk)
 
-    def validate_string(self, input_str):
+    @staticmethod
+    def validate_string(input_str):
         new_string = ""
 
         # scan through all characters of the string and only include characters
