@@ -6,5 +6,7 @@
     "pyunsplash": "*",
     "logging": "*",
     "tkinter": "*"
-  }
+  },
+  "wallpapers_per_page": 30,
+  "collections_per_page": 15
 }

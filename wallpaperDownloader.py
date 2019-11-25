@@ -11,26 +11,63 @@ from remove_mobile_wallpapers import RemoveMobileWallpapers
 
 class WallpaperDownloader:
     def __init__(self):
-        self.root_path = ''
         self.api_key = ''
+
+        # Paths
+        self.root_path = ''
         self.working_directory = os.getcwd()
-        self.photos_per_page = 30
-        self.collections_per_page = 15
+
+        # Default user options and states
         self.current_page = 1
+        self.photos_per_page = 10
+        self.collections_per_page = 10
 
-        with open('package.json') as json_file:
-            data = json.load(json_file)
-            self.root_path = data['root_directory']
-            self.api_key = data['API_key']
+        # Objects
+        self.un_obj = None
 
-        self.un_obj = pyunsplash.PyUnsplash(api_key=self.api_key)
-        self.current_collection_list = self.un_obj.collections(type_='featured', page=self.current_page,
-                                                               per_page=self.collections_per_page)
+        # Lists
+        self.current_collection_list = []
         self.checkbox_objects = []
         self.button_objects = []
         self.checkbox_states = []
+
+        # Styles
         self.background_color = "antique white"
         self.window_size = "450x500"
+        self.title = "Wallpaper Downloader"
+
+        # GUI items
+        self.root = None
+
+        # Frames
+        self.title_frame = None
+        self.contents_frame = None
+        self.buttons_frame = None
+
+        self.current_title = None
+
+        logging.getLogger("pyunsplash").setLevel(logging.DEBUG)
+
+    def load_from_package(self, file_name='package.json'):
+
+        assert os.path.exists(file_name), f"{file_name} does not exist."
+
+        with open(file_name) as json_file:
+            data = json.load(json_file)
+            self.root_path = data['root_directory']
+            self.api_key = data['API_key']
+            self.photos_per_page = data['wallpapers_per_page']
+            self.collections_per_page = data['collections_per_page']
+
+    def initialize_unsplash_object(self):
+        self.un_obj = pyunsplash.PyUnsplash(api_key=self.api_key)
+
+    def update_collection_list(self):
+        # populate current_collection_list with the collections corresponding to the current_page number
+        self.current_collection_list = self.un_obj.collections(type_='featured', page=self.current_page,
+                                                               per_page=self.collections_per_page)
+
+    def start_gui(self):
         self.root = Tk()
         self.root.geometry(self.window_size)
 
@@ -50,22 +87,7 @@ class WallpaperDownloader:
         self.current_title = Label(self.title_frame, text=f"Collection Page {self.current_page}",
                                    bg=self.background_color, fg="black")
         self.current_title.pack(side=TOP)
-        self.root.title("Wallpaper Downloader")
-
-        logging.getLogger("pyunsplash").setLevel(logging.DEBUG)
-
-        self.__main__()
-
-        RemoveMobileWallpapers().run()
-        os.chdir(self.working_directory)
-        move_wallpapers = MoveToCurrentWallpapers()
-        move_wallpapers.run()
-        os.chdir(self.working_directory)
-
-    def update_collection_list(self):
-        # populate current_collection_list with the collections corresponding to the current_page number
-        self.current_collection_list = self.un_obj.collections(type_='featured', page=self.current_page,
-                                                               per_page=self.collections_per_page)
+        self.root.title(self.title)
 
     def delete_checkboxes(self):
         for checkbox_object in self.checkbox_objects:
@@ -138,11 +160,29 @@ class WallpaperDownloader:
             print('Collection Successfully Downloaded!\n')
 
     def __main__(self):
+        self.load_from_package()
+
+        self.initialize_unsplash_object()
+
+        self.update_collection_list()
+
+        self.start_gui()
+
         self.create_buttons()
 
         self.create_checkboxes()
 
         self.root.mainloop()
+
+        RemoveMobileWallpapers().run()
+
+        os.chdir(self.working_directory)
+
+        move_wallpapers = MoveToCurrentWallpapers()
+
+        move_wallpapers.run()
+
+        os.chdir(self.working_directory)
 
     def make_collection_directory(self, directory_name):
         path = f"{self.root_path}{directory_name}"
@@ -181,4 +221,4 @@ class WallpaperDownloader:
         return new_string
 
 
-WallpaperDownloader()
+WallpaperDownloader().__main__()
