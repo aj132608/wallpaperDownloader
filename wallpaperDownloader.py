@@ -1,5 +1,3 @@
-from tkinter.ttk import Style
-
 import pyunsplash
 import requests
 import os
@@ -7,12 +5,15 @@ import logging
 import json
 from tkinter import *
 from move_to_current_wallpapers import MoveToCurrentWallpapers
+from multithreading_download import ThreadingDownload
+from remove_mobile_wallpapers import RemoveMobileWallpapers
 
 
 class WallpaperDownloader:
     def __init__(self):
         self.root_path = ''
         self.api_key = ''
+        self.working_directory = os.getcwd()
         self.photos_per_page = 30
         self.collections_per_page = 15
         self.current_page = 1
@@ -55,8 +56,11 @@ class WallpaperDownloader:
 
         self.__main__()
 
+        RemoveMobileWallpapers().run()
+        os.chdir(self.working_directory)
         move_wallpapers = MoveToCurrentWallpapers()
         move_wallpapers.run()
+        os.chdir(self.working_directory)
 
     def update_collection_list(self):
         # populate current_collection_list with the collections corresponding to the current_page number
@@ -120,17 +124,18 @@ class WallpaperDownloader:
     def download_collection(self, collection):
         directory_created = self.make_collection_directory(collection.title)
 
+        threads = []
+
         if directory_created:
             collection_photos = collection.photos(per_page=self.photos_per_page)
 
-            current_photo = 1
-
             for photo in collection_photos.entries:
-                print(f"Downloading wallpaper {current_photo} of {self.photos_per_page} \n")
-                self.download_image(collection.title, photo.link_download, photo.id)
-                current_photo += 1
+                threads.append(ThreadingDownload(collection.title, photo.link_download, self.root_path, photo.id))
 
-            print('\n')
+            for thread in threads:
+                thread.start()
+
+            print('Collection Successfully Downloaded!\n')
 
     def __main__(self):
         self.create_buttons()
