@@ -10,6 +10,7 @@ class MoveToCurrentWallpapers:
         self.current_wallpapers_path = ''
         self.project_path = ''
         self.current_wallpapers_path = ''
+        self.wallpapers_copied = 0
 
     def set_project_path(self, path=None):
         if path is None:
@@ -58,15 +59,17 @@ class MoveToCurrentWallpapers:
                 if wallpaper not in current_wallpapers_list:
                     try:
                         shutil.copy(wallpaper, self.current_wallpapers_path)
-                        print(f'Adding {wallpaper} to current_wallpapers')
+                        self.wallpapers_copied += 1
                     except shutil.SameFileError:
                         pass
 
             os.chdir(self.root_path)
 
     def run(self):
+        print("\nCopying All Wallpapers to current_wallpapers\n")
         self.set_project_path()
         self.scan_json()
         self.set_current_wallpapers_path()
         self.copy_all_wallpapers()
         os.chdir(self.project_path)
+        print(f"{self.wallpapers_copied} Wallpapers were copied successfully to current_wallpapers.\n\n")

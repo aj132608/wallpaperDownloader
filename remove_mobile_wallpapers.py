@@ -5,6 +5,7 @@ import os
 class RemoveMobileWallpapers:
     def __init__(self):
         self.root_path = ''
+        self.wallpapers_removed = 0
 
     def initialize_root_path(self):
         import json
@@ -14,6 +15,8 @@ class RemoveMobileWallpapers:
             self.root_path = data['root_directory']
 
     def run(self):
+        print("Removing All Mobile Wallpapers\n")
+
         self.initialize_root_path()
 
         os.chdir(self.root_path)
@@ -27,6 +30,8 @@ class RemoveMobileWallpapers:
 
                 if width < height:
                     os.remove(folder+"/"+wallpaper)
-                    print(f'Removed {wallpaper} from {folder}.')
+                    self.wallpapers_removed += 1
 
         os.chdir(self.root_path)
+
+        print(f"{self.wallpapers_removed} mobile wallpapers removed\n")
