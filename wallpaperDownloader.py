@@ -110,7 +110,6 @@ class WallpaperDownloader:
         # Create the Frames
         self.title_frame = Frame(self.root, bg=self.background_color)
         self.contents_frame = Frame(self.root, bd="2px", padx=10, bg=self.background_color)
-        # self.input_frame = Frame(self.root, bd="2px", bg=self.background_color)
         self.buttons_frame = Frame(self.root, padx=10, bg=self.background_color)
 
         # Pack the Frames
@@ -303,6 +302,8 @@ class WallpaperDownloader:
 
         self.root.mainloop()
 
+        del self.root
+
         RemoveMobileWallpapers().run()
 
         os.chdir(self.working_directory)
@@ -310,6 +311,8 @@ class WallpaperDownloader:
         move_wallpapers = MoveToCurrentWallpapers()
 
         move_wallpapers.run()
+
+        del move_wallpapers
 
         os.chdir(self.working_directory)
 
@@ -326,8 +329,9 @@ class WallpaperDownloader:
         path = f"{self.root_path}{directory_name}"
         try:
             os.mkdir(path)
-        except OSError:
+        except Exception as e:
             print(f"\n\nCreation of {directory_name} failed. Check {path}.\n\n")
+            print(e)
             return False
         else:
             print(f"\n\nSuccessfully created {directory_name}.\n\n")
